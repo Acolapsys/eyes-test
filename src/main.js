@@ -4,39 +4,54 @@ const $table = document.querySelector(".table");
 const $startButton = document.querySelector(".start-button");
 const $clearButton = document.querySelector(".clear-button");
 
+const onColor = "#fff";
+const offColor = "#222";
+
 let intervalId = null;
 let timeout = null;
 
 generateTable($table);
 
 const highLightCell = ($cell) => {
-  $cell.style.background = "#fff";
+  $cell.style.background = onColor;
 };
 
 const unHighLightCell = ($cell) => {
-  $cell.style.background = "#222";
+  $cell.style.background = offColor;
 };
 const clearTable = (node) => {
   for (let i = 0; i < node.childNodes.length; i++) {
     let child = node.childNodes[i];
-    console.log("1", child);
     clearTable(child);
     if (child.tagName === "td") {
       unHighLightCell(child);
     }
   }
 };
+const generateTestArray = () => {
+  const arr = [];
+  for (let i = 0; i < 50; i++) {
+    for (let j = 0; j < 50; j++) {
+      arr.push({ x: i, y: j });
+    }
+  }
+  return arr;
+};
 
 const startInterval = () => {
+  const testArr = generateTestArray();
   return setInterval(() => {
-    const x = Math.floor(Math.random() * 50);
-    const y = Math.floor(Math.random() * 50);
+    const idx = Math.floor(Math.random() * testArr.length - 1);
 
-    const $cell = $table.querySelector(`[data-x="${x}"][data-y="${y}"]`);
+    const $cell = $table.querySelector(
+      `[data-x="${testArr[idx].x}"][data-y="${testArr[idx].y}"]`
+    );
     highLightCell($cell);
     timeout = setTimeout(() => {
       unHighLightCell($cell);
-    }, 1000);
+    }, 500);
+    testArr.splice(idx, 1);
+    console.log(testArr.length);
   }, 1500);
 };
 const stop = () => {
