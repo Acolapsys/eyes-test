@@ -174,7 +174,7 @@ export default class App {
     });
   }
   saveImage() {
-    window.domtoimage
+    domtoimage
       .toJpeg(this.$table)
       .then(function (dataUrl) {
         const link = document.createElement("a");
