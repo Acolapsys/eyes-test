@@ -8,8 +8,5 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "dom-to-image": "^2.6.0"
-  }
+  "license": "ISC"
 }
