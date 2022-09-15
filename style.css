@@ -41,5 +41,40 @@ body {
 }
 
 .start-button {
-    margin-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+.clear-button {
+  margin-bottom: 1rem;
+}
+
+.options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 1rem;
+  column-gap: 4rem;
+}
+
+.block {
+  display: block;
+}
+.line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.line > input {
+  margin-left: 1rem;;
+}
+
+.buttons {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+
+}
+
+.save {
+  margin-left: 2rem;
 }

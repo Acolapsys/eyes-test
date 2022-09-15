@@ -4,19 +4,46 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" />
     <title>Eyes testing</title>
   </head>
   <body>
     <div class="container">
       <h1>Проверка зрения</h1>
       <table class="table"></table>
+      <div class="buttons">
+        <div class="container">
+          <button class="start-button"></button>
+          <button class="clear-button"></button>
+        </div>
+        <button class="save">Сохранить</button>
+      </div>
 
-      <button class="start-button">Start</button>
-      <button class="clear-button">Clear</button>
+      <div class="options">
+        <div class="line">
+          <p>Колонки:</p>
+          <input type="number" name="cols" id="cols" />
+        </div>
+        <div class="line">
+          <p>Ряды:</p>
+          <input type="number" name="rows" id="rows" />
+        </div>
+        <div class="line">
+          <p>Интервал подсветки(мс):</p>
+          <input type="number" name="highlightTime" id="highlightTime" />
+        </div>
+        <div class="line">
+          <p>Пауза(мс):</p>
+          <input type="number" name="pauseTime" id="pauseTime" />
+        </div>
+      </div>
+      <div><span>Осталось: </span><span class="counter">0</span></div>
     </div>
   </body>
- 
 
   <script type="module" src="src/main.js"></script>
+  <script src="./node_modules/dom-to-image/dist/dom-to-image.min.js" />
+  <script>
+    window.domtoimage = domtoimage;
+  </script>
 </html>
