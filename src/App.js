@@ -55,6 +55,10 @@ export default class App {
     return this.testArr?.length;
   }
 
+  get isStarted() {
+    return !!this.intervalId;
+  }
+
   setElTitle($el, title) {
     $el.innerHTML = title;
   }
@@ -98,9 +102,34 @@ export default class App {
       this.$table.append($row);
     });
 
-    const $circle = document.createElement("div");
-    $circle.classList.add("circle");
-    this.$table.append($circle);
+    const $cross = this.createCross();
+    this.$table.append($cross);
+  }
+
+  createCross() {
+    const iconSvg = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "svg"
+    );
+    const iconPath = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "path"
+    );
+
+    iconSvg.setAttribute("fill", "none");
+    iconSvg.setAttribute("viewBox", "0 0 24 24");
+    iconSvg.setAttribute("stroke", "currentColor");
+    iconSvg.setAttribute("stroke-width", "1.5");
+    iconSvg.classList.add("cross");
+
+    iconPath.setAttribute("d", "M12 6v12m6-6H6");
+    iconPath.setAttribute("stroke-linecap", "round");
+    iconPath.setAttribute("stroke-linejoin", "round");
+    iconPath.setAttribute("stroke-width", "2");
+
+    iconSvg.appendChild(iconPath);
+
+    return iconSvg;
   }
 
   generateTestArray() {
@@ -115,17 +144,21 @@ export default class App {
 
   startInterval() {
     return setInterval(() => {
-      const idx = Math.floor(Math.random() * this.testArr.length - 1);
+      if (this.testArr.length) {
+        const idx = Math.floor(Math.random() * (this.testArr.length - 1));
 
-      const $cell = this.$table.querySelector(
-        `[data-x="${this.testArr[idx].x}"][data-y="${this.testArr[idx].y}"]`
-      );
-      this.highLightCell($cell);
-      this.timeout = setTimeout(() => {
-        this.unHighLightCell($cell);
-      }, this.highlightTime);
-      this.testArr.splice(idx, 1);
-      this.setElTitle(this.$counter, this.leftCount);
+        const $cell = this.$table.querySelector(
+          `[data-x="${this.testArr[idx].x}"][data-y="${this.testArr[idx].y}"]`
+        );
+        this.highLightCell($cell);
+        this.timeout = setTimeout(() => {
+          this.unHighLightCell($cell);
+        }, this.highlightTime);
+        this.testArr.splice(idx, 1);
+        this.setElTitle(this.$counter, this.leftCount);
+      } else {
+        this.stop();
+      }
     }, this.stepTime);
   }
   stop() {
@@ -142,7 +175,7 @@ export default class App {
   initListeners() {
     this.$startButton.onclick = () => {
       this.$startButton.blur();
-      if (this.intervalId) {
+      if (this.isStarted) {
         this.stop();
       } else {
         this.start();
@@ -174,13 +207,11 @@ export default class App {
     });
   }
   saveImage() {
-    domtoimage
-      .toJpeg(this.$table)
-      .then(function (dataUrl) {
-        const link = document.createElement("a");
-        link.download = "sample-test.jpeg";
-        link.href = dataUrl;
-        link.click();
-      });
+    domtoimage.toJpeg(this.$table).then(function (dataUrl) {
+      const link = document.createElement("a");
+      link.download = "sample-test.jpeg";
+      link.href = dataUrl;
+      link.click();
+    });
   }
 }

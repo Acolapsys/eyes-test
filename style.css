@@ -29,15 +29,14 @@ body {
   background: #222;
   /* border: 1px solid #fff; */
 }
-.circle {
+.cross {
   position: absolute;
-  width: 3px;
-  height: 3px;
-  background-color: #fff;
+  width: 10px;
+  height: 10px;
+  color: red;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  border-radius: 50%;
 }
 
 .start-button {
