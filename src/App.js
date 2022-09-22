@@ -28,11 +28,15 @@ export default class App {
     this.$rowsCount = document.querySelector("#rows");
     this.$highlightTime = document.querySelector("#highlightTime");
     this.$pauseTime = document.querySelector("#pauseTime");
-    this.$save = document.querySelector(".save");
+    this.$saveButton = document.querySelector(".save-button");
+    this.$resultButton = document.querySelector(".result-button");
 
     this.testArr = [];
+    this.resultArr = [];
     this.intervalId = null;
     this.timeoutId = null;
+    this.$cell = null;
+    this.cellSaved = false;
     this.init();
   }
 
@@ -78,11 +82,16 @@ export default class App {
       $cell.style.background = colors.OFF;
     }
   }
+  clearActiveCell() {
+    this.$cell = null;
+    this.cellSaved = false;
+  }
 
-  generateTable() {
+  generateTable(withResult = false) {
     this.testArr = this.generateTestArray();
     this.setElTitle(this.$counter, this.leftCount);
     this.$table.innerHTML = "";
+
     const makeCell = () => {
       const $el = document.createElement("td");
       $el.classList.add("cell");
@@ -98,6 +107,15 @@ export default class App {
         $row.append($cell);
         $cell.setAttribute("data-x", cellIndex);
         $cell.setAttribute("data-y", rowIndex);
+        if (withResult) {
+          const isHighlighted = this.resultArr.findIndex(
+            (el) => +el.x === +cellIndex && +el.y === +rowIndex
+          );
+
+          if (isHighlighted !== -1) {
+            this.highLightCell($cell);
+          }
+        }
       });
       this.$table.append($row);
     });
@@ -147,12 +165,13 @@ export default class App {
       if (this.testArr.length) {
         const idx = Math.floor(Math.random() * (this.testArr.length - 1));
 
-        const $cell = this.$table.querySelector(
+        this.$cell = this.$table.querySelector(
           `[data-x="${this.testArr[idx].x}"][data-y="${this.testArr[idx].y}"]`
         );
-        this.highLightCell($cell);
-        this.timeout = setTimeout(() => {
-          this.unHighLightCell($cell);
+        this.highLightCell(this.$cell);
+        this.timeoutId = setTimeout(() => {
+          this.unHighLightCell(this.$cell);
+          this.clearActiveCell();
         }, this.highlightTime);
         this.testArr.splice(idx, 1);
         this.setElTitle(this.$counter, this.leftCount);
@@ -172,20 +191,40 @@ export default class App {
     this.intervalId = this.startInterval();
   }
 
+  clearAll() {
+    this.stop();
+    this.clearActiveCell();
+    clearTimeout(this.timeoutId);
+    this.timeoutId = null;
+  }
+
+  unFocusButtons() {
+    this.$startButton.blur();
+    this.$clearButton.blur();
+    this.$saveButton.blur();
+    this.$resultButton.blur();
+  }
+
+  startButtonHandler() {
+    this.unFocusButtons();
+    if (this.isStarted) {
+      this.stop();
+    } else {
+      this.start();
+    }
+  }
+
   initListeners() {
-    this.$startButton.onclick = () => {
-      this.$startButton.blur();
-      if (this.isStarted) {
-        this.stop();
-      } else {
-        this.start();
-      }
-    };
+    this.$startButton.onclick = this.startButtonHandler.bind(this);
     this.$clearButton.onclick = () => {
-      this.generateTable(this.$table);
+      this.resultArr = [];
+      this.generateTable();
     };
-    this.$save.onclick = () => {
+    this.$saveButton.onclick = () => {
       this.saveImage();
+    };
+    this.$resultButton.onclick = () => {
+      this.showImage();
     };
     this.$colsCount.onchange = (e) => {
       this.colsCount = +e.target.value;
@@ -199,13 +238,24 @@ export default class App {
     this.$highlightTime.onchange = (e) => {
       this.highlightTime = +e.target.value;
     };
-    window.addEventListener("keydown", () => {
-      if (this.timeout) {
-        clearTimeout(this.timeout);
-        this.timeout = null;
+    window.addEventListener("keydown", (e) => {
+      if (e.code === "Space") {
+        if (this.timeoutId && this.$cell && !this.cellSaved) {
+          const x = this.$cell.getAttribute("data-x");
+          const y = this.$cell.getAttribute("data-y");
+          this.resultArr.push({ x, y });
+          this.cellSaved = true;
+        }
+      } else if (e.code === "KeyQ") {
+        this.startButtonHandler();
       }
     });
   }
+
+  showImage() {
+    this.generateTable(true);
+  }
+
   saveImage() {
     domtoimage.toJpeg(this.$table).then(function (dataUrl) {
       const link = document.createElement("a");
